@@ -4,6 +4,6 @@ from flask import (
 
 bp = Blueprint('home', __name__, url_prefix='/')
 
-@bp.route('/home', methods=['GET', 'POST'])
+@bp.route('/', methods=['GET', 'POST'])
 def home():
     return render_template('/home.html')
