@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Riiran{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    <div class="split left">
+        <div class="centered">
+            <h2>Riiran is a Yoruba word that translates directly to "vision"</h2>
+            <p>
+                Riiran is a simple Braille to Text converter. The conversion engine is built using 
+                <a href="https://github.com/IlyaOvodov/AngelinaDataset"> Angelina Dataset</a> dataset
+                provided by <a href="https://github.com/IlyaOvodov">Ilya Ovodov</a>
+            </p>
+                {% if success %}
+                <img src="{{ url_for('index.display_image', filename=filename) }}" alt="Uploaded Image">
+                <p>Image uploaded successfully!</p>
+                {% endif %}
+                {% if error %}
+                <p style="color: red;">{{ error }}</p>
+                {% endif %}
+                <div id="uploadedImageContainer" style="display: none;">
+                   
+                    <img id="uploadedImage" alt="Uploaded Image" style="max-width: 100%;">
+                </div>
+            <p>
+                Upload an image of a braille text and have your English text on the translation board.
+                <p>
+                    <input type="file" id="brailleImage" name="braille-image" accept="image/jpeg, image/png, image/jpg">
+                </p>
+                <p>
+                    <button onClick="uploadImage()">Convert</button>
+                </p>
+
+            </p>
+
+            <p>
+                Made with <span style="color: #e25555;">&#9829;</span> by <a href="https://github.com/osobotu">Obotu</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="split right">
+        <div class="centered">
+            <h2>Translation Board</h2>
+            <textarea id="translationBoard" readonly> Translation will appear here</textarea>
+        </div>
+    </div>
+
+    <script>
+        function uploadImage() {
+            const inputElement = document.getElementById('brailleImage');
+            const file = inputElement.files[0];
+
+            if (!file) {
+                alert('Please select an image file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('braille-image', file);
+
+            fetch('http://127.0.0.1:5000/upload', {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    let json = JSON.parse(data);
+                    //console.log(data.image_url);
+                   displayUploadedImage(json['image_url']); // Display the server's response
+                   addText(json['message'])
+                })
+                .catch(error => {
+                    alert()
+                    console.error('Error:', error);
+                });
+        }
+
+        function displayUploadedImage(imageUrl) {
+                const uploadedImageContainer = document.getElementById('uploadedImageContainer');
+                const uploadedImage = document.getElementById('uploadedImage');
+                    
+                uploadedImage.src = imageUrl;
+                uploadedImageContainer.style.display = 'block';
+        }
+
+        function addText(value) {
+                // Get the textarea element
+                var textarea = document.getElementById('translationBoard');
+
+                // Add text to the textarea
+                textarea.value = value;
+        }
+    </script>
+
+  
+{% endblock %}
