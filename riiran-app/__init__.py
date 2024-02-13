@@ -1,12 +1,12 @@
 import os
-from flask import Flask 
+from flask import Flask
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'riiran.sqlite'),
-        UPLOAD_FOLDER = 'riiran/static/uploads',
+        UPLOAD_FOLDER = 'riiran-app/static/uploads',
     )
 
     if test_config is None:
@@ -35,10 +35,13 @@ def create_app(test_config=None):
 
     from . import cleanup
     cleanup.start_cleanup_scheduler(app)
+
     
     return app
 
 app = create_app()
+
+
 
 
 
